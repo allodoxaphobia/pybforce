@@ -100,9 +100,10 @@ class BFThread(Thread):
                         self.engine._killbit=self.engine._exitonhit
             else:
                 #empty worklist, let thread die and report back
-                die()
+                self.engine._threadsfinished= self.engine._threadsfinished+1
                 return 0
-        self.die(0)
+        self.engine._threadsfinished= self.engine._threadsfinished+1
+        return 0
 
 #end class
 
@@ -211,7 +212,7 @@ def setoptions(args):
     STATUS = str(options.STATUS)
     EXITONHIT= int(options.EXIT)
 
-    if CHARSET != "":
+    if len(CHARSET) != 0:
         print "# Computing permutations, this might take a while..."
     	tmp = Permutations(CHARSET,LENGTH)
 	WORKLIST= tmp.get("",FIXLENGTH) #todo: add support for prefixes and suffixes
