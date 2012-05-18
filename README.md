@@ -14,30 +14,45 @@ Trapping of possitive result occurs by:
   as dynamic timeouts, this to accomodate timing attacks based on server load (to atchieve this before every request
   a benchmarking request wuill be made)
 
+
 usage:
-pybforce -mode:0 [options] url
-mode : 0,1,2 
-        0 means trapping via regex, requires -regex option
-        1, absolute timing attack, requires -time option
-        2, dynamic timing attack, requires -time option
-        3, trap http response status, requires -status option
-url: the url to attack, by default the value $1 will be replaced with the bruteforce strings, another 
-      repleace code can be specified via -replace
-options:
-  -time set the timeout to trap in seconds
-  -regex set regular expreassion to trap
-  -status set http response status to trap
-  -replace specify another replace code placed in your url string
-  -file: specify file to read with items to try
-  -chars: specify characters to test
-  -len: maximum length to test, default is 8
-  -fixlen either 1 or 0 , 1 means only strings of length -len will be used, 0 means from length 1 to -len, default is 1
-  -status 304
+------
+
+pybforce [options] url
+
+
+options
+--------
+
+-m 	mode : 0,1,2 default is 0
+        0 means trapping via regex, requires -p option to be set to a regular expression
+        1, trap http response codes, requires -p option to be set to a http response status code
+        2, trap response times, requires requires -p option to be set to a interval in seconds, this setting will then be used for the socket timeout
+        3, trap dynamic response times, not yet implemented
+-p	mode parameter, either a regular expression, a http response code or a time interval in seconds
+-c	character set: characters to use in permutations
+-l	maximum length of permutations
+-x	pemrutations have a fixed length (value of -l)
+-f	use this to load a files with a list of values (each value on seperate line), this can be used in stead of the -r option
+-t	threads, number of threads/connections to use, default is 750
+-e	set to 0 if you want to keep scanning after a match is found, default is   1, meaning the scanner will stop if a match is found
+
+
+url
+----
+the url to use, by default the value #1 will be replaced with the bruteforce strings. Currently there is no option to change the replace code
+
 examples:
-  pybforce -mode 3 -status 301 -chars 0123456789 -len 4 -fixlen 1 http://somehost/userauth.php?pincode=$1
-  #scans for all permutations of 0-9 with a fixed length of 4 and traps the result via redirect
-  pybfore -mode 0 -regex error -chars "</'{}&|@#" -length 1 http://someost/page.aspx?novalidation=$1
-  # scans for special chars and traps the word error
+---------
+  example 1: pin code bruteforcing
+  scan for all permutations of 0-9 with a fixed length of 4 and will result in a hit if the word success is found on the page
+  option -e  is ommited, the default is 1, this example will stop when a matching page is found
+  # pybforce.py -c "0123456789" -l -x 1 -p "^success" http://www.targetserver.net/login.php?pincdoe=#1
+
+  example 2: url bruteforcer
+  this example scans a directory for mfilenames with extentiion .jpg and matches the resulting http 200 response status
+  # pybforce.py -m 1 -p 200 -c "0123456789ABCDEF" -l 12 -x 1 http://somehost/images/#1.jpg
+
 
 
 
